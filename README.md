@@ -9,3 +9,7 @@ Android项目开发框架——RxBasicFun项目功能、控件库
 * [广播使用](/docs/receive_use.md)
 * [图片(文件)上传](/docs/file_upload.md)
 * [页面统计——变得简单](/docs/statistics_pager.md)
+* [Picker选择器]
+	* [时间选择器](/docs/time_picker.md)
+	* [地区选择器](/docs/area_picker.md)
+	* [自定义选择器](/docs/cus_picker.md)
