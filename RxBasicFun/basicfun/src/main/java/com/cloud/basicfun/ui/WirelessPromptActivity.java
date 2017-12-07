@@ -1,6 +1,8 @@
 package com.cloud.basicfun.ui;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
@@ -8,9 +10,8 @@ import android.widget.TextView;
 import com.cloud.basicfun.BaseActivity;
 import com.cloud.basicfun.BaseApplication;
 import com.cloud.basicfun.R;
-import com.cloud.basicfun.utils.BaseCommonUtils;
-import com.cloud.core.RxCoreUtils;
-import com.cloud.core.config.RxConfig;
+import com.cloud.basicfun.configs.BaseBConfig;
+import com.cloud.core.configs.RxCoreConfigItems;
 import com.cloud.core.logger.Logger;
 import com.cloud.resources.RedirectUtils;
 
@@ -39,10 +40,10 @@ public class WirelessPromptActivity extends BaseActivity {
             if (currapp.getReturnIcon() != 0) {
                 returnib.setBackgroundResource(currapp.getReturnIcon());
             }
-            RxConfig config = RxCoreUtils.getInstance().getConfig(getActivity());
-            if (config.getThemeColorResId() != 0) {
+            RxCoreConfigItems configItems = BaseBConfig.getInstance().getConfigItems(getActivity());
+            if (!TextUtils.isEmpty(configItems.getThemeColor())) {
                 View headview = findViewById(R.id.head_layout_rl);
-                headview.setBackgroundResource(config.getThemeColorResId());
+                headview.setBackgroundColor(Color.parseColor(configItems.getThemeColor()));
             }
             returnib.setOnClickListener(new OnClickListener() {
                 @Override
@@ -52,10 +53,8 @@ public class WirelessPromptActivity extends BaseActivity {
             });
             TextView nonetworkconntv = (TextView) findViewById(R.id.subject_tv);
             nonetworkconntv.setText(R.string.no_network_connection);
-            TextView channelsourcetv = (TextView) findViewById(R.id.channel_source_tv);
-            channelsourcetv.setText(BaseCommonUtils.getChannelName(""));
         } catch (Exception e) {
-            Logger.L.error("wireless init error:", e);
+            Logger.L.error(e);
         }
     }
 }

@@ -12,13 +12,16 @@ import android.text.TextUtils;
 
 import com.cloud.basicfun.BaseApplication;
 import com.cloud.basicfun.beans.UpdateInfoBean;
+import com.cloud.basicfun.configs.BaseBConfig;
 import com.cloud.basicfun.enums.RxReceiverActions;
 import com.cloud.core.Action;
-import com.cloud.core.RxCoreUtils;
 import com.cloud.core.beans.ApkInfo;
 import com.cloud.core.beans.InstanceUpdateServiceInfoEntity;
 import com.cloud.core.beans.LoadingRes;
-import com.cloud.core.config.RxConfig;
+import com.cloud.core.configs.ApiConfig;
+import com.cloud.core.configs.ConfigItem;
+import com.cloud.core.configs.OnConfigItemUrlListener;
+import com.cloud.core.configs.RxCoreConfigItems;
 import com.cloud.core.enums.ApkDownloadType;
 import com.cloud.core.enums.Direction;
 import com.cloud.core.enums.MaskAlign;
@@ -148,40 +151,69 @@ public class UpdateBLL {
                         mloading.show(miusinfo.getCheckUpdatePromptText(), MaskAlign.CENTER, false, Direction.NONE);
                     }
                 }
-                RxConfig config = RxCoreUtils.getInstance().getConfig(properties.getActivity());
-                if (TextUtils.isEmpty(config.getRequestUpdateInfoUrl())) {
+                RxCoreConfigItems configItems = BaseBConfig.getInstance().getConfigItems(properties.getActivity());
+                ConfigItem versionCheck = configItems.getAppVersionCheck();
+                if (versionCheck.isState()) {
+                    Object urlListener = BaseApplication.getInstance().getObjectValue(versionCheck.getUrlType());
+                    if (urlListener != null && urlListener instanceof OnConfigItemUrlListener) {
+                        OnConfigItemUrlListener listener = (OnConfigItemUrlListener) urlListener;
+                        String url = listener.getUrl(versionCheck.getUrlType());
+                        if (TextUtils.isEmpty(url)) {
+                            if (mloading != null) {
+                                mloading.dismiss();
+                            }
+                            onCheckCompleted();
+                            CheckCompleteFlag = true;
+                        } else {
+                            OkRxManager.getInstance().get(properties.getActivity(),
+                                    url,
+                                    null,
+                                    null,
+                                    false,
+                                    "",
+                                    0,
+                                    new Action<String>() {
+                                        @Override
+                                        public void call(String response) {
+                                            UpdateInfoBean updateInfoBean = JsonUtils.parseT(response, UpdateInfoBean.class);
+                                            if (updateInfoBean == null) {
+                                                return;
+                                            }
+                                            UpdateInfoBean data = updateInfoBean.getData();
+                                            if (data == null) {
+                                                return;
+                                            }
+                                            data.setCode(updateInfoBean.getCode());
+                                            data.setMessage(updateInfoBean.getMessage());
+                                            updateInfoDealwithAndStart(data, versionUpdateProperties.getAppIcon());
+                                        }
+                                    },
+                                    new Action<RequestState>() {
+                                        @Override
+                                        public void call(RequestState requestState) {
+                                            if (requestState == RequestState.Completed) {
+                                                if (mloading != null) {
+                                                    mloading.dismiss();
+                                                }
+                                                onCheckCompleted();
+                                                CheckCompleteFlag = true;
+                                            }
+                                        }
+                                    }, null, "");
+                        }
+                    } else {
+                        if (mloading != null) {
+                            mloading.dismiss();
+                        }
+                        onCheckCompleted();
+                        CheckCompleteFlag = true;
+                    }
+                } else {
                     if (mloading != null) {
                         mloading.dismiss();
                     }
                     onCheckCompleted();
                     CheckCompleteFlag = true;
-                } else {
-                    OkRxManager.getInstance().get(properties.getActivity(),
-                            config.getRequestUpdateInfoUrl(),
-                            null,
-                            null,
-                            false,
-                            "",
-                            0,
-                            new Action<String>() {
-                                @Override
-                                public void call(String response) {
-                                    UpdateInfoBean updateInfoBean = JsonUtils.parseT(response, UpdateInfoBean.class);
-                                    updateInfoDealwithAndStart(updateInfoBean, versionUpdateProperties.getAppIcon());
-                                }
-                            },
-                            new Action<RequestState>() {
-                                @Override
-                                public void call(RequestState requestState) {
-                                    if (requestState == RequestState.Completed) {
-                                        if (mloading != null) {
-                                            mloading.dismiss();
-                                        }
-                                        onCheckCompleted();
-                                        CheckCompleteFlag = true;
-                                    }
-                                }
-                            }, null, "");
                 }
             } catch (Exception e) {
                 if (mloading != null) {
@@ -199,8 +231,9 @@ public class UpdateBLL {
      * @param appicon 应用图标
      */
     private void updateInfoDealwithAndStart(UpdateInfoBean result, int appicon) {
-        RxConfig config = RxCoreUtils.getInstance().getConfig(versionUpdateProperties.getActivity());
-        if (config.getApiConfig().getApiRet().contains(result.getCode())) {
+        RxCoreConfigItems configItems = BaseBConfig.getInstance().getConfigItems(versionUpdateProperties.getActivity());
+        ApiConfig apiConfigs = configItems.getApiConfigs();
+        if (apiConfigs.getApiSuccessRet().contains(result.getCode())) {
             if (result == null) {
                 return;
             }

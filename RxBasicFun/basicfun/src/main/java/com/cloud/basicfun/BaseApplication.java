@@ -5,8 +5,7 @@ import android.app.Application;
 import android.os.Bundle;
 
 import com.cloud.basicfun.events.OnBehaviorStatistics;
-import com.cloud.basicfun.picker.AddressPickerUtils;
-import com.cloud.core.Func0;
+import com.cloud.core.Action0;
 import com.cloud.core.exception.CrashHandler;
 import com.cloud.core.logger.Logger;
 
@@ -33,19 +32,23 @@ public class BaseApplication extends Application {
     private OnBehaviorStatistics onBehaviorStatistics = null;
 
     /**
-     * 检测更新url(配置文件)
-     */
-    private String checkUpdateUrl = "";
-    /**
      * 返回图标
      */
     private int returnIcon = 0;
 
-    /**
-     * token action
-     */
-    private Func0<String> tokenAction = null;
     private boolean isBackGround = false;
+    /**
+     * 更新检测完成
+     */
+    private Action0 updateCheckComplate = null;
+
+    public void setUpdateCheckComplate(Action0 updateCheckComplate) {
+        this.updateCheckComplate = updateCheckComplate;
+    }
+
+    public Action0 getUpdateCheckComplate() {
+        return this.updateCheckComplate;
+    }
 
     protected void onAppSiwtchToBack() {
 
@@ -166,26 +169,6 @@ public class BaseApplication extends Application {
         }
     }
 
-
-    /**
-     * 获取检测更新url(配置文件)
-     */
-    public String getCheckUpdateUrl() {
-        if (checkUpdateUrl == null) {
-            checkUpdateUrl = "";
-        }
-        return checkUpdateUrl;
-    }
-
-    /**
-     * 设置检测更新url(配置文件)
-     *
-     * @param checkUpdateUrl
-     */
-    public void setCheckUpdateUrl(String checkUpdateUrl) {
-        this.checkUpdateUrl = checkUpdateUrl;
-    }
-
     /**
      * 设置行为统计监听
      *
@@ -225,24 +208,6 @@ public class BaseApplication extends Application {
 
     public static BaseApplication getInstance() {
         return mbapp;
-    }
-
-    /**
-     * 获取token
-     * action
-     */
-    public Func0<String> getTokenAction() {
-        return this.tokenAction;
-    }
-
-    /**
-     * 设置token
-     * action
-     *
-     * @param getTokenAction
-     */
-    public void setTokenAction(Func0<String> tokenAction) {
-        this.tokenAction = tokenAction;
     }
 
     @Override

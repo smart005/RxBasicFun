@@ -61,6 +61,8 @@ public abstract class FileUploadUtils {
     private final String UPLOAD_DIALOG_ID = "1820554346";
     private DialogPlus dialogPlus = null;
     private Activity activity = null;
+    ALiYunOssRole aLiYunOssRole = new ALiYunOssRole();
+    private long startRequestRoleTime = 0;
 
     protected abstract void onUploadSuccess(int position, String relativeUrl, String updateType, Object extra);
 
@@ -231,54 +233,20 @@ public abstract class FileUploadUtils {
         uploadMap.put("UPLOAD_TYPE", fileUploadParam.updateType);
         uploadMap.put("POSITION", fileUploadParam.position);
         uploadMap.put("ORIGINAL_FILE_NAME", fileUploadParam.originalFileName);
-        ossUtils.requestALiYunAssumeRole(activity, fileUploadParam.assumeRoleUrl, uploadMap);
+        long timeMillis = System.currentTimeMillis();
+        long diffTime = timeMillis - startRequestRoleTime;
+        if (diffTime >= (10 * 60 * 1000)) {
+            ossUtils.requestALiYunAssumeRole(activity, fileUploadParam.assumeRoleUrl, uploadMap);
+        } else {
+            updateFileDealWith(uploadMap);
+        }
     }
 
-    private OssUtils ossUtils = new OssUtils() {
-        @Override
-        protected void onOssUploadProgress(PutObjectRequest request, long currentSize, long totalSize, String uploadTypeFlag, String uploadType, String target) {
-            if (TextUtils.equals(target, UPLOAD_FILE_TAG)) {
-                try {
-                    if (NetworkUtils.isConnected(activity)) {
-                        Thread.sleep(30);
-                        float progress = (currentSize * 100 / totalSize);
-                        Bundle bundle = new Bundle();
-                        bundle.putFloat("PROGRESS_KEY", progress);
-                        Message message = mhandler.obtainMessage(UPLOADING_WITH);
-                        message.setData(bundle);
-                        mhandler.sendMessage(message);
-                    } else {
-                        mhandler.obtainMessage(UPLOAD_NOT_NETWORK_FLAG).sendToTarget();
-                    }
-                } catch (InterruptedException e) {
-                    Logger.L.info("progress thread 200 error:", e);
-                }
+    private void updateFileDealWith(HashMap<String, Object> uploadMap) {
+        try {
+            if (aLiYunOssRole == null) {
+                return;
             }
-        }
-
-        @Override
-        protected void onOssUploadProgress(ResumableUploadRequest request, long currentSize, long totalSize, String uploadTypeFlag, String uploadType, String target) {
-            if (TextUtils.equals(target, UPLOAD_FILE_TAG)) {
-                try {
-                    if (NetworkUtils.isConnected(activity)) {
-                        Thread.sleep(30);
-                        float progress = (currentSize * 100 / totalSize);
-                        Bundle bundle = new Bundle();
-                        bundle.putFloat("PROGRESS_KEY", progress);
-                        Message message = mhandler.obtainMessage(UPLOADING_WITH);
-                        message.setData(bundle);
-                        mhandler.sendMessage(message);
-                    } else {
-                        mhandler.obtainMessage(UPLOAD_NOT_NETWORK_FLAG).sendToTarget();
-                    }
-                } catch (InterruptedException e) {
-                    Logger.L.info("progress thread 200 error:", e);
-                }
-            }
-        }
-
-        @Override
-        protected void onRequestALiYunAssumeRoleSuccess(ALiYunOssRole aLiYunOssRole, HashMap<String, Object> uploadMap) {
             ossUtils.setContext(activity)
                     .setAccessKeyId(aLiYunOssRole.getAccessKeyId())
                     .setAccessKeySecret(aLiYunOssRole.getAccessKeySecret())
@@ -339,6 +307,58 @@ public abstract class FileUploadUtils {
                 onCompleted();
                 mhandler.obtainMessage(DISMISS_LOADING).sendToTarget();
             }
+        } catch (Exception e) {
+            Logger.L.error(e);
+        }
+    }
+
+    private OssUtils ossUtils = new OssUtils() {
+        @Override
+        protected void onOssUploadProgress(PutObjectRequest request, long currentSize, long totalSize, String uploadTypeFlag, String uploadType, String target) {
+            if (TextUtils.equals(target, UPLOAD_FILE_TAG)) {
+                try {
+                    if (NetworkUtils.isConnected(activity)) {
+                        Thread.sleep(30);
+                        float progress = (currentSize * 100 / totalSize);
+                        Bundle bundle = new Bundle();
+                        bundle.putFloat("PROGRESS_KEY", progress);
+                        Message message = mhandler.obtainMessage(UPLOADING_WITH);
+                        message.setData(bundle);
+                        mhandler.sendMessage(message);
+                    } else {
+                        mhandler.obtainMessage(UPLOAD_NOT_NETWORK_FLAG).sendToTarget();
+                    }
+                } catch (InterruptedException e) {
+                    Logger.L.info("progress thread 200 error:", e);
+                }
+            }
+        }
+
+        @Override
+        protected void onOssUploadProgress(ResumableUploadRequest request, long currentSize, long totalSize, String uploadTypeFlag, String uploadType, String target) {
+            if (TextUtils.equals(target, UPLOAD_FILE_TAG)) {
+                try {
+                    if (NetworkUtils.isConnected(activity)) {
+                        Thread.sleep(30);
+                        float progress = (currentSize * 100 / totalSize);
+                        Bundle bundle = new Bundle();
+                        bundle.putFloat("PROGRESS_KEY", progress);
+                        Message message = mhandler.obtainMessage(UPLOADING_WITH);
+                        message.setData(bundle);
+                        mhandler.sendMessage(message);
+                    } else {
+                        mhandler.obtainMessage(UPLOAD_NOT_NETWORK_FLAG).sendToTarget();
+                    }
+                } catch (InterruptedException e) {
+                    Logger.L.info("progress thread 200 error:", e);
+                }
+            }
+        }
+
+        @Override
+        protected void onRequestALiYunAssumeRoleSuccess(ALiYunOssRole aLiYunOssRole, HashMap<String, Object> uploadMap) {
+            FileUploadUtils.this.aLiYunOssRole = aLiYunOssRole;
+            updateFileDealWith(uploadMap);
         }
 
         @Override

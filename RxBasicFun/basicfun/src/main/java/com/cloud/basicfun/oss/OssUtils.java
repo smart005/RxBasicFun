@@ -18,13 +18,13 @@ import com.alibaba.sdk.android.oss.model.ResumableUploadRequest;
 import com.alibaba.sdk.android.oss.model.ResumableUploadResult;
 import com.cloud.basicfun.BaseApplication;
 import com.cloud.basicfun.beans.ALiYunOssRole;
+import com.cloud.basicfun.configs.BaseBConfig;
 import com.cloud.core.Action;
-import com.cloud.core.Action0;
 import com.cloud.core.Func0;
 import com.cloud.core.ObjectJudge;
-import com.cloud.core.RxCoreUtils;
-import com.cloud.core.config.AliConfig;
-import com.cloud.core.config.RxConfig;
+import com.cloud.core.configs.ConfigItem;
+import com.cloud.core.configs.OnConfigTokenListener;
+import com.cloud.core.configs.RxCoreConfigItems;
 import com.cloud.core.enums.DateFormatEnum;
 import com.cloud.core.logger.Logger;
 import com.cloud.core.okrx.OkRxManager;
@@ -335,41 +335,51 @@ public class OssUtils {
                                         HashMap<String, Object> uploadMap) {
         this.uploadMap = uploadMap;
         HttpParams params = new HttpParams();
-        Func0<String> tokenAction = BaseApplication.getInstance().getTokenAction();
-        if (tokenAction == null) {
+        RxCoreConfigItems configItems = BaseBConfig.getInstance().getConfigItems(context);
+        ConfigItem configItem = configItems.getToken();
+        BaseApplication currapp = BaseApplication.getInstance();
+        Object tokenListener = currapp.getObjectValue(configItem.getType());
+        if (tokenListener != null && tokenListener instanceof OnConfigTokenListener) {
+            OnConfigTokenListener listener = (OnConfigTokenListener) tokenListener;
+            if (TextUtils.isEmpty(configItem.getName())) {
+                OssUtils.this.onRequestALiYunAssumeRoleCompleted();
+                return;
+            } else {
+                String token = listener.getToken(configItem.getType());
+                if (TextUtils.isEmpty(token)) {
+                    OssUtils.this.onRequestALiYunAssumeRoleCompleted();
+                    return;
+                } else {
+                    params.put(configItem.getName(), token);
+                    HttpHeaders httpHeaders = new HttpHeaders();
+                    httpHeaders.put(configItem.getName(), token);
+                    OkRxManager.getInstance().get(context,
+                            assumeRoleUrl,
+                            httpHeaders,
+                            params,
+                            false,
+                            "",
+                            0,
+                            new Action<String>() {
+                                @Override
+                                public void call(String response) {
+                                    ALiYunOssRole aLiYunOssRole = JsonUtils.parseT(response, ALiYunOssRole.class);
+                                    OssUtils.this.onRequestALiYunAssumeRoleSuccess(aLiYunOssRole, OssUtils.this.uploadMap);
+                                }
+                            },
+                            new Action<RequestState>() {
+                                @Override
+                                public void call(RequestState requestState) {
+                                    if (requestState == RequestState.Completed) {
+                                        OssUtils.this.onRequestALiYunAssumeRoleCompleted();
+                                    }
+                                }
+                            }, null, "");
+                }
+            }
+        } else {
             OssUtils.this.onRequestALiYunAssumeRoleCompleted();
             return;
         }
-        RxConfig config = RxCoreUtils.getInstance().getConfig(context);
-        if (TextUtils.isEmpty(config.getTokenName())) {
-            OssUtils.this.onRequestALiYunAssumeRoleCompleted();
-            return;
-        }
-        AliConfig aliConfig = config.getAliConfig();
-        params.put(config.getTokenName(), tokenAction.call());
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.put(config.getTokenName(), tokenAction.call());
-        OkRxManager.getInstance().get(context,
-                assumeRoleUrl,
-                httpHeaders,
-                params,
-                false,
-                "",
-                0,
-                new Action<String>() {
-                    @Override
-                    public void call(String response) {
-                        ALiYunOssRole aLiYunOssRole = JsonUtils.parseT(response, ALiYunOssRole.class);
-                        OssUtils.this.onRequestALiYunAssumeRoleSuccess(aLiYunOssRole, OssUtils.this.uploadMap);
-                    }
-                },
-                new Action<RequestState>() {
-                    @Override
-                    public void call(RequestState requestState) {
-                        if (requestState == RequestState.Completed) {
-                            OssUtils.this.onRequestALiYunAssumeRoleCompleted();
-                        }
-                    }
-                }, null, "");
     }
 }

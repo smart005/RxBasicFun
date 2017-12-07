@@ -50,6 +50,10 @@ public class BundleMap {
         map.put(key, value);
     }
 
+    public HashMap<String, Object> getMap() {
+        return this.map;
+    }
+
     public int getInt(String key) {
         if (map.containsKey(key)) {
             return ConvertUtils.toInt(map.get(key));

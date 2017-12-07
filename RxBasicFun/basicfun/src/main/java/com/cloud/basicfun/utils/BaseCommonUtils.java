@@ -21,8 +21,6 @@ import com.cloud.basicfun.BaseApplication;
 import com.cloud.basicfun.R;
 import com.cloud.basicfun.enums.RxReceiverActions;
 import com.cloud.basicfun.ui.WirelessPromptActivity;
-import com.cloud.core.RxCoreUtils;
-import com.cloud.core.config.RxConfig;
 import com.cloud.core.enums.RuleParams;
 import com.cloud.core.logger.Logger;
 import com.cloud.core.utils.AppInfoUtils;
@@ -158,32 +156,6 @@ public class BaseCommonUtils {
     }
 
     /**
-     * 获取渠道名
-     *
-     * @param channelName 如果channelName不为空则返回channelName渠道
-     * @return
-     */
-    public static String getChannelName(String channelName) {
-        try {
-            if (!TextUtils.isEmpty(channelName)) {
-                return channelName;
-            }
-            BaseApplication baseApplication = BaseApplication.getInstance();
-            Bundle mbundle = AppInfoUtils.getApplicationMetaData(baseApplication);
-            if (mbundle != null) {
-                RxConfig config = RxCoreUtils.getInstance().getConfig(baseApplication);
-                if (mbundle.containsKey(config.getChannelName())) {
-                    channelName = mbundle.getString(config.getChannelName());
-                }
-            }
-            return channelName;
-        } catch (Exception e) {
-            Logger.L.error("get channel name error:", e);
-        }
-        return "";
-    }
-
-    /**
      * 加载静态库文件是否成功
      *
      * @param libName 静态库名称
@@ -199,7 +171,7 @@ public class BaseCommonUtils {
             }
             return true;
         } catch (Exception e) {
-            Logger.L.error("load so library error:", e);
+            Logger.L.error(e);
         }
         return false;
     }

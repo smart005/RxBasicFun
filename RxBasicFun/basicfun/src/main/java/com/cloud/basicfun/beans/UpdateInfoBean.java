@@ -10,7 +10,7 @@ import com.cloud.core.beans.BaseBean;
  * @Modifier:
  * @ModifyContent:
  */
-public class UpdateInfoBean extends BaseBean {
+public class UpdateInfoBean extends BaseUpdateBean<UpdateInfoBean> {
 
     /**
      * 版本号

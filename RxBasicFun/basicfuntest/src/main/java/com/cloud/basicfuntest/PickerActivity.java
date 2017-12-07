@@ -6,10 +6,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.cloud.basicfun.BaseActivity;
+import com.cloud.basicfun.beans.ALiYunOssRole;
+import com.cloud.basicfun.oss.OssUtils;
 import com.cloud.basicfun.picker.AddressPickerUtils;
 import com.cloud.basicfun.picker.CusPickerUtils;
 import com.cloud.basicfun.picker.OptionsItem;
 import com.cloud.basicfun.picker.TimePickerUtils;
+import com.cloud.basicfun.utils.BundleMap;
+import com.cloud.core.Action;
+import com.cloud.core.okrx.OkRxManager;
+import com.cloud.core.okrx.RequestState;
+import com.cloud.core.utils.JsonUtils;
 import com.cloud.resources.picker.OptionsPickerView;
 import com.cloud.resources.picker.TimePickerView;
 
@@ -28,7 +36,7 @@ import butterknife.OnClick;
  * @Modifier:
  * @ModifyContent:
  */
-public class PickerActivity extends Activity {
+public class PickerActivity extends BaseActivity {
 
     @BindView(R.id.city_btn)
     Button cityBtn;
@@ -42,6 +50,35 @@ public class PickerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.picker_view);
         ButterKnife.bind(this);
+        //init();
+    }
+
+    public static void startActivity(Activity activity) {
+        BundleMap bundleMap = getBundleMap();
+        startActivity(activity, null, bundleMap);
+    }
+
+    private void init() {
+        String url = "https://img.mibaostore.cn/goods/20171109/39086021cb6d410aaa8cf9e9b74f6825.png?x-oss-process=image/info";
+        OkRxManager.getInstance().get(this,
+                url,
+                null,
+                null,
+                false,
+                "",
+                0,
+                new Action<String>() {
+                    @Override
+                    public void call(String response) {
+
+                    }
+                },
+                new Action<RequestState>() {
+                    @Override
+                    public void call(RequestState requestState) {
+
+                    }
+                }, null, "");
     }
 
     @OnClick(R.id.city_btn)

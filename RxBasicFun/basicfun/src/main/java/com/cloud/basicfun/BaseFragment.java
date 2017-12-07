@@ -1,5 +1,6 @@
 package com.cloud.basicfun;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,11 +11,19 @@ import com.cloud.basicfun.events.OnBehaviorStatistics;
 import com.cloud.basicfun.update.UpdateBLL;
 import com.cloud.basicfun.update.VersionUpdateProperties;
 import com.cloud.basicfun.utils.BundleMap;
+import com.cloud.basicfun.utils.BundleUtils;
 import com.cloud.basicfun.utils.WinObjectUtils;
-import com.cloud.core.RxCoreUtils;
-import com.cloud.core.config.RxConfig;
+import com.cloud.core.configs.BaseCConfig;
+import com.cloud.core.configs.ConfigItem;
+import com.cloud.core.configs.OnConfigItemUrlListener;
+import com.cloud.core.configs.RxCoreConfigItems;
+import com.cloud.core.enums.ResFolderType;
+import com.cloud.core.utils.ResUtils;
 import com.cloud.core.utils.SharedPrefUtils;
+import com.cloud.resources.RedirectUtils;
 import com.cloud.resources.hvlayout.HeaderScrollHelper;
+
+import java.util.Map;
 
 /**
  * @Author lijinghuan
@@ -62,6 +71,14 @@ public class BaseFragment extends Fragment implements HeaderScrollHelper.Scrolla
         return currPageIndex = 1;
     }
 
+    /**
+     * 实例Fragment对象
+     *
+     * @param t    要实例的Fragment类对象
+     * @param args bundle对象
+     * @param <T>
+     * @return
+     */
     public static <T extends BaseFragment> T newInstance(T t, Bundle args) {
         if (args != null) {
             t.setArguments(args);
@@ -69,14 +86,13 @@ public class BaseFragment extends Fragment implements HeaderScrollHelper.Scrolla
         return t;
     }
 
-    public static <T extends BaseFragment> T newInstance(T t, String param) {
-        Bundle args = new Bundle();
-        RxConfig config = RxCoreUtils.getInstance().getConfig(t.getContext());
-        args.putString(config.getArgParam(), param);
-        t.setArguments(args);
-        return t;
-    }
-
+    /**
+     * 实例Fragment对象
+     *
+     * @param t   要实例的Fragment类对象
+     * @param <T>
+     * @return
+     */
     public static <T extends BaseFragment> T newInstance(T t) {
         return newInstance(t, (Bundle) null);
     }
@@ -142,12 +158,26 @@ public class BaseFragment extends Fragment implements HeaderScrollHelper.Scrolla
                 SharedPrefUtils.setPrefLong(getActivity(), "UPDATE_VERSION_KEY", System.currentTimeMillis());
                 VersionUpdateProperties properties = new VersionUpdateProperties();
                 properties.setActivity(getActivity());
-                RxConfig config = RxCoreUtils.getInstance().getConfig(getActivity());
-                properties.setAppIcon(config.getAppIcon());
-                properties.setIsAutoUpdate(true);
-                properties.setIsCheckUpdatePrompt(false);
-                properties.setCheckUpdateUrl(BaseApplication.getInstance().getCheckUpdateUrl());
-                ubll.checkVersionUpdate(properties);
+                RxCoreConfigItems configItems = BaseCConfig.getInstance().getConfigItems(getActivity());
+                ConfigItem versionCheck = configItems.getAppVersionCheck();
+                if (versionCheck.isState()) {
+                    //设置图标
+                    ConfigItem appIcon = configItems.getAppIcon();
+                    ResFolderType folderType = ResFolderType.getResFolderType(appIcon.getType());
+                    int appIconRresId = ResUtils.getResource(getActivity(), appIcon.getName(), folderType);
+                    properties.setAppIcon(appIconRresId);
+                    properties.setIsAutoUpdate(true);
+                    properties.setIsCheckUpdatePrompt(false);
+                    //设置请求地址
+                    BaseApplication currapp = BaseApplication.getInstance();
+                    Object urlListener = currapp.getObjectValue(versionCheck.getUrlType());
+                    if (urlListener != null && urlListener instanceof OnConfigItemUrlListener) {
+                        OnConfigItemUrlListener listener = (OnConfigItemUrlListener) urlListener;
+                        String url = listener.getUrl(versionCheck.getUrlType());
+                        properties.setCheckUpdateUrl(url);
+                        ubll.checkVersionUpdate(properties);
+                    }
+                }
             }
         }
     };
@@ -287,12 +317,45 @@ public class BaseFragment extends Fragment implements HeaderScrollHelper.Scrolla
         return getLongBundle(key, 0);
     }
 
+    /**
+     * Fragment回调方法,在其它页面拿到当前Fragment对象后调用onFragmentCall时执行
+     *
+     * @param action    区分是哪一次回调
+     * @param bundleMap BundleMap参数集合
+     */
     public void onFragmentCall(String action, BundleMap bundleMap) {
-        //回调方法
+
     }
 
+    /**
+     * 使用{@link com.cloud.resources.hvlayout.HeaderTabsViewLayout}控件时,
+     * Fragment需要通过此回调返回具体滚动的视图
+     *
+     * @return
+     */
     @Override
     public View getScrollableView() {
         return null;
+    }
+
+    protected static BundleMap getBundleMap() {
+        BundleMap bundleMap = new BundleMap();
+        return bundleMap;
+    }
+
+    /**
+     * 启动activity
+     *
+     * @param activity
+     * @param params   参数
+     */
+    protected static void startActivity(Activity activity, Class<?> cls, BundleMap paramsMap) {
+        Bundle bundle = new Bundle();
+        if (paramsMap != null) {
+            for (Map.Entry<String, Object> entry : paramsMap.getMap().entrySet()) {
+                BundleUtils.setBundleValue(bundle, entry.getKey(), entry.getValue());
+            }
+        }
+        RedirectUtils.startActivity(activity, cls, bundle);
     }
 }
