@@ -18,3 +18,5 @@ Android项目开发框架——RxBasicFun项目功能、控件库
 	* [BaseAppCompatActivity](/docs/base_app_compat_activity.md)
 	* [BaseFragmentActivity](/docs/base_fragment_activity.md)
 	* [BaseFragment](/docs/base_fragment.md)
+* [APP版本更新配置](/docs/app_version_update_config.md)
+* [Easypermissions授权](/docs/easy_permission.md)
