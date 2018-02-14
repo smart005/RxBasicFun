@@ -67,7 +67,14 @@ public void onActivityResult(int requestCode, int resultCode, Intent data) {
     }
 }
 ```
-
+###### 4.AndroidManifest.xml需要注册以下信息
+```xml
+<activity
+android:name="com.cloud.basicfun.permissions.AppSettingsDialogHolderActivity"
+android:exported="false"
+android:label=""
+android:theme="@style/EasyPermissions.Transparent"/>
+```
 ```java
 具体需要用到哪些权限可以从Manifest.permission.*下面取;
 ```
