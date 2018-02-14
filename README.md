@@ -20,3 +20,4 @@ Android项目开发框架——RxBasicFun项目功能、控件库
 	* [BaseFragment](/docs/base_fragment.md)
 * [APP版本更新配置](/docs/app_version_update_config.md)
 * [Easypermissions授权](/docs/easy_permission.md)
+* [Scheme Url使用](/docs/scheme_url_use.md)
