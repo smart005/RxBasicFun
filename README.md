@@ -8,6 +8,7 @@ Android项目开发框架——RxBasicFun项目功能、控件库
 ### 使用文档
 * [广播使用](/docs/receive_use.md)
 * 图片
+	* [图片选择组件](/docs/image_select.md)
 	* [文件上传](/docs/file_upload.md)
 	* [缩略图(图片)预览/删除/(自动)上传](/docs/image_review_del_upload.md)
 * [行为页面统计——无埋点统计](/docs/statistics_pager.md)

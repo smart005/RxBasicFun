@@ -1,0 +1,3 @@
+header:版本号  时间 referer
+
+header时间+query参数+body 摘要 ——》RSA加密——》header
