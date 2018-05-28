@@ -80,8 +80,6 @@ imageSelectDialog.setMaxImageWidth(720);
 imageSelectDialog.setMaxImageHeight(1920);
 //true选择图片后进行裁剪
 imageSelectDialog.setTailoring(true);
-//裁剪框的最小宽、高
-imageSelectDialog.setTailoringSize(200, 300);
 //裁剪框的最大宽、高
 imageSelectDialog.withMaxSize(400, 600);
 //裁剪框宽、高比例
@@ -116,8 +114,6 @@ imageSelectDialog.setMaxImageWidth(720);
 imageSelectDialog.setMaxImageHeight(1920);
 //true选择图片后进行裁剪
 imageSelectDialog.setTailoring(true);
-//裁剪框的最小宽、高
-imageSelectDialog.setTailoringSize(200, 300);
 //裁剪框的最大宽、高
 imageSelectDialog.withMaxSize(400, 600);
 //裁剪框宽、高比例
