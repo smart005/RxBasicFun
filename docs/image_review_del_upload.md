@@ -74,27 +74,24 @@ selectImgSev.checkAndUploads();
 | app:iev_delImageMarginLeft   | 设置删除图标左边距         |
 | app:iev_delImageMarginTop    | 设置删除图标上边距         |
 ###### 方法属性
-\begin{table}[]
-\begin{tabular}{ll}
-控件属性                                                           & 描述                              \\
-setActivity(Activity activity)                                 & 设置当前活动Activity                  \\
-setOssAssumeRoleUrl(String ossAssumeRoleUrl)                   & 设置oss授权Url地址                    \\
-onActivityResult(int requestCode, int resultCode, Intent data) & 选择图片时通过该方法返回数据                  \\
-checkAndUploads()                                              & 检查并上传；如果是自动上传则对所有未上传完成的图片显示总进度; \\
-setAddImage(boolean isAddImage)                                & 是否允许添加图片                        \\
-setAllowDel(boolean isAllowDel)                                & 设置是否允许删除                        \\
-setOnlyRead(boolean isOnlyRead)                                & 设置该控件只允许预览(不能修改和删除图片)           \\
-setMaxImageHeight(int maxImageHeight)                          & 最大图片高度(默认为1920)                 \\
-setMaxImageWidth(int maxImageWidth)                            & 最大图片宽度(默认为1080)                 \\
-setMaxFileSize(int maxFileSize)                                & 最大文件大小(默认为1024KB)               \\
-setTailoring(boolean isTailoring)                              & 是否需要剪裁(只有单选时此属性才生效,默认为false)    \\
-setShowTakingPictures(boolean isShowTakingPictures)            & 是否显示拍照图片(默认为显示)                 \\
-withAspect(int x, int y)                                       & 设置裁剪宽高比                         \\
-withMaxSize(int width, int height)                             & 设置裁剪最大宽高                        \\
-bindImages(List imgs)                                          & 绑定图片列表（可用于默认图片显示）               \\
-getSelectImageItems()                                          & 获取已选择图片集合                       \\
-getUploadedUrls()                                              & 获取已上传的图片集合                     
-\end{tabular}
-\end{table}
+| 控件属性                                                       | 描述                                                          |
+|----------------------------------------------------------------|---------------------------------------------------------------|
+| setActivity(Activity activity)                                 | 设置当前活动Activity                                          |
+| setOssAssumeRoleUrl(String ossAssumeRoleUrl)                   | 设置oss授权Url地址                                            |
+| onActivityResult(int requestCode, int resultCode, Intent data) | 选择图片时通过该方法返回数据                                  |
+| checkAndUploads()                                              | 检查并上传；如果是自动上传则对所有未上传完成的图片显示总进度; |
+| setAddImage(boolean isAddImage)                                | 是否允许添加图片                                              |
+| setAllowDel(boolean isAllowDel)                                | 设置是否允许删除                                              |
+| setOnlyRead(boolean isOnlyRead)                                | 设置该控件只允许预览(不能修改和删除图片)                      |
+| setMaxImageHeight(int maxImageHeight)                          | 最大图片高度(默认为1920)                                      |
+| setMaxImageWidth(int maxImageWidth)                            | 最大图片宽度(默认为1080)                                      |
+| setMaxFileSize(int maxFileSize)                                | 最大文件大小(默认为1024KB)                                    |
+| setTailoring(boolean isTailoring)                              | 是否需要剪裁(只有单选时此属性才生效,默认为false)              |
+| setShowTakingPictures(boolean isShowTakingPictures)            | 是否显示拍照图片(默认为显示)                                  |
+| withAspect(int x, int y)                                       | 设置裁剪宽高比                                                |
+| withMaxSize(int width, int height)                             | 设置裁剪最大宽高                                              |
+| bindImages(List imgs)                                          | 绑定图片列表（可用于默认图片显示）                            |
+| getSelectImageItems()                                          | 获取已选择图片集合                                            |
+| getUploadedUrls()                                              | 获取已上传的图片集合                                          |
 
 
