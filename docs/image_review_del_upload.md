@@ -42,8 +42,17 @@ selectImgSev.setOnReviewImageListener(new OnReviewImageListener() {
 //图片选择回调监听
 selectImgSev.setOnImageSelectedListener(new OnImageSelectedListener() {
     @Override
-    public void onImageSelected(SelectImageItem selectImageItem, HashMap<Integer, SelectImageItem> selectImageItems) {
+    public void onImageSelected(SelectImageItem selectImageItem, List<SelectImageItem> selectImageItems) {
         //选择图片回调
+    }
+});
+//设置已拖拽图片回调监听
+selectImgSev.setOnDrageredImageListener(new OnDrageredImageListener() {
+    @Override
+    public void onDrageredImage(SelectImageItem drageredSelectImage, int oldPosition, int position) {
+        //drageredSelectImage:已拖拽图片
+        //oldPosition:拖拽前图片索引
+        //oldPosition:拖拽后图片索引
     }
 });
 ```
@@ -60,19 +69,20 @@ selectImgSev.checkAndUploads();
 ```
 *至此控件基本用法已完成，相关的属性、方法及事件用法请继续往下看.*
 ###### 控件属性
-| 控件属性                     | 描述                       |
-|------------------------------|----------------------------|
-| app:iev_addBackgoundResource | 设置添加按钮默认图片       |
-| app:iev_eachRowNumber        | 允许每一行显示的个数       |
-| app:iev_isAddImage           | 是否允许添加图片           |
-| app:iev_isAllowDel           | 选择图片后是否允许删除     |
-| app:iev_isAllowModify        | 是否允许对已选择的图片修改 |
-| app:iev_isAutoUploadImage    | 选择图片后是否允许自动上传 |
-| app:iev_maxImageCount        | 允许选择最大图片数量       |
-| app:iev_isAlignMiddle        | 预览图片的网格是否居中对齐 |
-| app:iev_delImage             | 设置删除图标               |
-| app:iev_delImageMarginLeft   | 设置删除图标左边距         |
-| app:iev_delImageMarginTop    | 设置删除图标上边距         |
+| 控件属性                     | 描述                               |
+|------------------------------|------------------------------------|
+| app:iev_addBackgoundResource | 设置添加按钮默认图片               |
+| app:iev_eachRowNumber        | 允许每一行显示的个数               |
+| app:iev_isAddImage           | 是否允许添加图片                   |
+| app:iev_isAllowDel           | 选择图片后是否允许删除             |
+| app:iev_isAllowModify        | 是否允许对已选择的图片修改         |
+| app:iev_isAutoUploadImage    | 选择图片后是否允许自动上传         |
+| app:iev_maxImageCount        | 允许选择最大图片数量               |
+| app:iev_isAlignMiddle        | 预览图片的网格是否居中对齐         |
+| app:iev_delImage             | 设置删除图标                       |
+| app:iev_delImageMarginLeft   | 设置删除图标左边距                 |
+| app:iev_delImageMarginTop    | 设置删除图标上边距                 |
+| app:iev_isAllowDrager        | 是否允许对上传或选择的图片进行拖拽 |
 ###### 方法属性
 | 控件属性                                                       | 描述                                                          |
 |----------------------------------------------------------------|---------------------------------------------------------------|
